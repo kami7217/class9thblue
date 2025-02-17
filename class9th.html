@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: #fff;
+        }
+
+        .container {
+            width: 70%;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            margin: 0;
+            color: #0072ff;
+            font-size: 24px;
+        }
+
+        .header img {
+            max-width: 100px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .header h3, .header h4 {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .timer {
+            text-align: right;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question p {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .options label {
+            display: block;
+            margin: 12px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .options input {
+            margin-right: 10px;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .buttons button {
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background-color: #0072ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .buttons button:disabled {
+            cursor: not-allowed;
+            background-color: #ccc;
+        }
+
+        .buttons button:hover {
+            background-color: #005bb5;
+            transform: scale(1.05);
+        }
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            width: 50%;
+            color: #333;
+        }
+
+        .popup h2 {
+            text-align: center;
+        }
+
+        .popup button {
+            background-color: #f44336;
+            margin-top: 20px;
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .popup button:hover {
+            background-color: #e53935;
+            transform: scale(1.1);
+        }
+
+        .popup .pass {
+            color: green;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .popup .fail {
+            color: red;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* Styling for the Start Page */
+        #student-login-form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        #student-name, #roll-number {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #0072ff;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        #student-name:focus, #roll-number:focus {
+            border-color: #005bb5;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            background-color: #00c6ff;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: #0072ff;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            background-color: #005bb5;
+        }
+
+        .print-btn {
+            background-color: #4CAF50;
+            font-size: 16px;
+        }
+
+        .print-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-container" style="display:none;">
+    <div class="header">
+      <img src="ed.jpg" style="width:150px; align-items: center; "> <!-- Placeholder for logo -->
+        <h3>Class: 9th <div style="color:blue">blue</div></h3>
+        <h4>Teacher: Mr. Kamran</h4>
+        <div class="timer" id="timer"><h2>Time Left: 5:00</h2></div>
+    </div>
+    <div class="question" id="question-container">
+        <!-- Question will be dynamically injected here -->
+    </div>
+    <div class="options" id="options-container">
+        <!-- Options will be dynamically injected here -->
+    </div>
+    <div class="buttons">
+        <button id="back-button" onclick="previousQuestion()" disabled>Back</button>
+        <button id="next-button" onclick="nextQuestion()" disabled>Next</button>
+    </div>
+</div>
+
+<div id="start-container" class="container">
+  <img src="ed.jpg" style="width:150px; align-items: center; ">
+    <div id="student-login-form">
+	
+        <input type="text" id="student-name" placeholder="Enter Your Name">
+        <input type="text" id="roll-number" placeholder="Enter Your Roll Number">
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+</div>
+
+<div id="result-popup" class="popup">
+    <h2>Quiz Results</h2>
+    <p id="student-name-result"></p>
+    <p id="result-message"></p>
+    <div id="percentage-message"></div>
+    <div id="pass-fail-message"></div>
+    <button onclick="closePopup()">Close</button>
+    <button class="print-btn" onclick="printResult()">Print</button>
+</div>
+
+<script>
+    const questions = [
+        {question: "___ technology is used to design the product in the manufacturing industry.", options: ["CAD", "CAM", "CAN", "CBT"], answer: "CAD"},
+        {question: "Transistors were used in ___ generation of computers.", options: ["1st", "2nd", "3rd", "4th"], answer: "2nd"},
+        {question: "What is a piece of text or an image in a document that can connect readers to another portion of the document or a web page called?", options: ["Margin", "Hyperlink", "File", "Web Page"], answer: "Hyperlink"},
+        {question: "Which represents the overall data transmission capacity of a computer network?", options: ["Bandwidth", "Data rate", "Signal Strength", "Baud Rate"], answer: "Bandwidth"},
+        {question: "___ program is used to view internet web sites/pages.", options: ["Web Viewer", "Word", "Excel", "Google Chrome"], answer: "Google Chrome"},
+        {question: "The special character that initiates the formula mode in a cell is:", options: ["=", "-", "+", "0"], answer: "="},
+        {question: "___ transmission media uses light waves for transmitting information.", options: ["Twisted Pair Cable", "Telephone Line", "Fiber Optic Cable", "Coaxial Cable"], answer: "Fiber Optic Cable"},
+        {question: "Which of the following is not an operating system?", options: ["UNIX", "DOS", "Mac OS", "Fedora"], answer: "Fedora"},
+        {question: "How many tabs are in Word 2007 window?", options: ["6", "7", "8", "9"], answer: "7"},
+        {question: "__ is a person who uses special tools for breaking into a computer system.", options: ["Cracker", "SE", "DBA", "Hackers"], answer: "Hackers"},
+        {question: "Which of the following malware displays advertisements on the screen?", options: ["Worm", "Adware", "Trojan", "Virus"], answer: "Adware"},
+        {question: "The actual working area in Microsoft Excel is:", options: ["Workbook", "Worksheet", "Spreadsheet", "Notesheet"], answer: "Worksheet"},
+        {question: "__________ is a handheld device that combines computing, telephone/fax, internet, and networking features.", options: ["Laptop", "Palmtop", "PDA", "Notebook"], answer: "PDA"},
+        {question: "The term 'program' refers to any piece of:", options: ["Software", "Netware", "Hardware", "Groupware"], answer: "Software"},
+        {question: "A computer part used to process and store data is called:", options: ["Hard Disk", "System Unit", "Motherboard", "Monitor"], answer: "System Unit"},
+        {question: "Which of the following is not a multi-user operating system?", options: ["UNIX", "Linux", "MS-DOS", "Windows 2000"], answer: "MS-DOS"},
+        {question: "In MS-Windows, the __________ folder is used to store deleted items.", options: ["Computer", "Document", "Recycle Bin", "Control Panel"], answer: "Recycle Bin"},
+        {question: "Blank space around the page is called:", options: ["Margin", "Hyperlink", "File", "Web Page"], answer: "Margin"},
+        {question: "Communication __________ is the pathway over which messages can be sent from one place to another.", options: ["Cable", "Link", "System", "Device"], answer: "Link"},
+        {question: "The supporting data rates of Infrared reach up to __________ Mbps.", options: ["2", "3", "4", "5"], answer: "4"},
+        {question: "__________ topology has the highest reliability.", options: ["Bus", "Ring", "Star", "Mesh"], answer: "Star"},
+        {question: "Which of the following is advertising-supported software?", options: ["Worm", "Adware", "Spyware", "Malware"], answer: "Adware"}
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = [];
+    let timer;
+    let studentName, rollNumber;
+
+    // Shuffle questions
+    function shuffleQuestions() {
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [questions[i], questions[j]] = [questions[j], questions[i]]; // Swap
+        }
+    }
+
+    function startQuiz() {
+        studentName = document.getElementById('student-name').value;
+        rollNumber = document.getElementById('roll-number').value;
+
+        if (studentName.trim() === "" || rollNumber.trim() === "") {
+            alert("Please enter both your name and roll number.");
+            return;
+        }
+
+        shuffleQuestions();
+        document.getElementById('start-container').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        startTimer();
+        displayQuestion();
+    }
+
+    function startTimer() {
+        let timeLeft = 5 * 60;
+        timer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                checkResult();
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function displayQuestion() {
+        const question = questions[currentQuestionIndex];
+        document.getElementById('question-container').innerHTML = `<p>Question ${currentQuestionIndex + 1}: ${question.question}</p>`;
+
+        let optionsHtml = "";
+        question.options.forEach(option => {
+            optionsHtml += `
+                <label>
+                    <input type="radio" name="answer" value="${option}" onchange="saveAnswer('${option}')">
+                    ${option}
+                </label>
+            `;
+        });
+        document.getElementById('options-container').innerHTML = optionsHtml;
+
+        document.getElementById('back-button').disabled = currentQuestionIndex === 0;
+        document.getElementById('next-button').textContent = currentQuestionIndex === questions.length - 1 ? "Submit" : "Next";
+        document.getElementById('next-button').disabled = true; // Initially disable the Next button
+    }
+
+    function saveAnswer(answer) {
+        selectedAnswers[currentQuestionIndex] = answer;
+        document.getElementById('next-button').disabled = false; // Enable Next button once an answer is selected
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            checkResult();
+        }
+    }
+
+    function previousQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+
+    function checkResult() {
+        clearInterval(timer);
+
+        let correctAnswers = 0;
+        questions.forEach((q, index) => {
+            if (selectedAnswers[index] === q.answer) {
+                correctAnswers++;
+            }
+        });
+
+        // Round off the percentage
+        let percentage = Math.round((correctAnswers / questions.length) * 100);
+        let passFailMessage = correctAnswers >= 18 ? '<div class="pass">Congratulations you passed!</div>' : '<div class="fail">You Failed!</div>';
+        let resultMessage = `You answered ${correctAnswers} out of ${questions.length} questions correctly.`;
+        let percentageMessage = `Your Percentage: ${percentage}%`;
+
+        // Show result with student name, roll number, pass/fail message, and percentage
+        document.getElementById('student-name-result').textContent = `Student: ${studentName} (Roll No: ${rollNumber})`;
+        document.getElementById('result-message').textContent = resultMessage;
+        document.getElementById('percentage-message').textContent = percentageMessage;
+        document.getElementById('pass-fail-message').innerHTML = passFailMessage;
+
+        // Display the school logo in the result popup
+        const logoHtml = '<img src="ed.jpg" style="width:150px; display:block; margin: 0 auto 10px;">';
+        document.getElementById('result-popup').innerHTML = logoHtml + document.getElementById('result-popup').innerHTML;
+
+        document.getElementById('result-popup').style.display = 'block';
+    }
+
+    function closePopup() {
+        document.getElementById('result-popup').style.display = 'none';
+        location.reload();
+    }
+
+    function printResult() {
+        window.print();
+    }
+</script>
+
+</body>
+</html>
